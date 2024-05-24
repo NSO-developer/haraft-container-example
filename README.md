@@ -1,5 +1,5 @@
 # Containerized NSO Example - HA RAFT
-Example usecase of running HA RAFT with Containerized NSO
+Example usecase of running HA RAFT with Containerized NSO. This example is modified from the official example in example.ncs - high-availability/raft-cluster
 
 ## Useage
 The Makefile have the following target  
