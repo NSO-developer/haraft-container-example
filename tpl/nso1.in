@@ -1,0 +1,3 @@
+# DNS:<ip adress> is a workaround for host verification to work in
+# Distributed Erlang. currently IP:<ip address> doesn't have any effect
+subjectAltName=IP:10.0.0.1,  DNS:10.0.0.1

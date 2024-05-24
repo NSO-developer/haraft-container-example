@@ -1,0 +1,16 @@
+  <!-- :add:/ncs-config -->
+  <ha-raft>
+    <enabled>true</enabled>
+    <cluster-name>stockholm</cluster-name>
+    <listen>
+      <node-address>nso~{ID}@10.0.0.~{ID}</node-address>
+    </listen>
+    <seed-nodes>
+      <seed-node>nso2@10.0.0.~{ID}</seed-node>
+    </seed-nodes>
+    <ssl>
+      <ca-cert-file>/nso/certs/ca.crt</ca-cert-file>
+      <cert-file>/nso/certs/nso~{ID}.crt</cert-file>
+      <key-file>/nso/certs/nso~{ID}.key</key-file>
+    </ssl>
+  </ha-raft>

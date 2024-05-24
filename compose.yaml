@@ -1,0 +1,132 @@
+services:
+     NSO-1:
+       image: mod-nso-prod:$VER
+       container_name: nso1
+       profiles:
+             - prod
+       environment:
+             - EXTRA_ARGS=--with-package-reload
+             - ADMIN_USERNAME=admin
+             - ADMIN_PASSWORD=admin
+       networks:
+           NSO-net:
+             ipv4_address: 10.0.0.1
+       ports:
+             - "2023:2024"
+             - "8889:8888"
+       volumes:
+             - type: bind
+               source: './NSO-vol/NSO1'
+               target: '/nso'
+             - type: bind
+               source: './NSO-log-vol/NSO1'
+               target: '/log'
+       healthcheck:
+            test: ncs_cmd -c "wait-start 2"
+            interval: 5s
+            retries: 5
+            start_period: 10s
+            timeout: 10s
+
+     NSO-2:
+       image: mod-nso-prod:$VER
+       container_name: nso2
+       profiles:
+             - prod
+       environment:
+             - EXTRA_ARGS=--with-package-reload
+             - ADMIN_USERNAME=admin
+             - ADMIN_PASSWORD=admin
+       networks:
+           NSO-net:
+             ipv4_address: 10.0.0.2
+
+       ports:
+             - "2025:2024"
+             - "8887:8888"
+       volumes:
+             - type: bind
+               source: './NSO-vol/NSO2'
+               target: '/nso'
+             - type: bind
+               source: './NSO-log-vol/NSO2'
+               target: '/log'
+       healthcheck:
+            test: ncs_cmd -c "wait-start 2"
+            interval: 5s
+            retries: 5
+            start_period: 10s
+            timeout: 10s
+
+     NSO-3:
+       image: mod-nso-prod:$VER
+       container_name: nso3
+       profiles:
+             - prod
+       environment:
+             - EXTRA_ARGS=--with-package-reload
+             - ADMIN_USERNAME=admin
+             - ADMIN_PASSWORD=admin
+       networks:
+           NSO-net:
+             ipv4_address: 10.0.0.3
+
+       ports:
+             - "2026:2024"
+             - "8886:8888"
+       volumes:
+             - type: bind
+               source: './NSO-vol/NSO3'
+               target: '/nso'
+             - type: bind
+               source: './NSO-log-vol/NSO3'
+               target: '/log'
+       healthcheck:
+            test: ncs_cmd -c "wait-start 2"
+            interval: 5s
+            retries: 5
+            start_period: 10s
+            timeout: 10s
+
+
+     BUILD-NSO-PKGS:
+            image: mod-nso-dev:$VER
+            container_name: nso-dev
+            network_mode: none
+            profiles:
+                - dev
+            entrypoint: bash
+            command: -c 'NODE_ID=1 /nso1/helpers/update-conf.sh /nso1/etc/ncs.conf $(ls /nso1/tpl/ncs-conf/*.xml /nso1/tpl/ncs-conf/*.val | sort) &&
+                 NODE_ID=2 /nso2/helpers/update-conf.sh /nso2/etc/ncs.conf $(ls /nso2/tpl/ncs-conf/*.xml /nso2/tpl/ncs-conf/*.val | sort) &&
+                 NODE_ID=3 /nso3/helpers/update-conf.sh /nso3/etc/ncs.conf $(ls /nso3/tpl/ncs-conf/*.xml /nso3/tpl/ncs-conf/*.val | sort) &&
+                 chmod 600  /nso1/certs/*.key &&
+                 chmod 600  /nso2/certs/*.key &&
+                 chmod 600  /nso3/certs/*.key'
+            volumes:
+                - type: bind
+                  source: './NSO-vol/NSO1'
+                  target: '/nso1'
+                - type: bind
+                  source: './NSO-log-vol/NSO1'
+                  target: '/log_nso1'
+                - type: bind
+                  source: './NSO-vol/NSO2'
+                  target: '/nso2'
+                - type: bind
+                  source: './NSO-log-vol/NSO2'
+                  target: '/log_nso2'
+                - type: bind
+                  source: './NSO-vol/NSO3'
+                  target: '/nso3'
+                - type: bind
+                  source: './NSO-log-vol/NSO3'
+                  target: '/log_nso3'
+
+
+networks:
+  NSO-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/16
+          gateway: 10.0.0.254
