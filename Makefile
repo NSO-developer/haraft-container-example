@@ -79,6 +79,9 @@ clean_cdb:
 
 
 start:
+	cp config/ncs.conf NSO-vol/NSO1/etc/ncs.conf
+	cp config/ncs.conf NSO-vol/NSO2/etc/ncs.conf
+	cp config/ncs.conf NSO-vol/NSO3/etc/ncs.conf
 	export VER=${VER} ; docker compose up ${ENABLED_SERVICES} -d
 	bash check_status.sh
 	docker exec nso1 bash -c 'chmod 777 -R /nso/*'
