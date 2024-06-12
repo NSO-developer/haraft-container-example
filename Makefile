@@ -1,6 +1,7 @@
 VER=6.2.3
 ENABLED_SERVICES=NSO-1 NSO-2 NSO-3 BUILD-NSO-PKGS
 ARCH=x86_64
+DESTS=NSO-vol/NSO1 NSO-vol/NSO2 NSO-vol/NSO3
 
 build: certs
 	docker load -i ./images/nso-${VER}.container-image-dev.linux.${ARCH}.tar.gz
@@ -17,7 +18,7 @@ build: certs
 	docker cp nso-prod:/nso/ NSO-vol/
 	mv NSO-vol/nso NSO-vol/NSO1
 	rm -rf NSO-vol/nso
-	$(MAKE) NSO-vol/NSO1 NSO-vol/NSO2 NSO-vol/NSO3
+	$(MAKE) NSO-vol
 	$(MAKE) install-certs 
 	docker stop nso-prod && docker rm nso-prod
 	#cp config/device_conf/nso1.xml NSO-vol/NSO1/run/cdb
@@ -38,18 +39,20 @@ install-certs:
 	cp -f raft/certs/ca.crt raft/certs/nso3.crt raft/private/nso3.key NSO-vol/NSO3/certs
 	chmod 600 NSO-vol/NSO*/certs/*.key
 
-NSO-vol/NSO*:
-	echo $@
-	-cp -R NSO-vol/NSO1/* $@
-	cp util/Makefile $@/run/packages/
-	cp config/ncs.conf $@/etc/ncs.conf
-	cp -R helpers $@
-	cp -R tpl $@
-	#NODE_ID=$* helpers/update-conf.sh $@/etc/ncs.conf $$(ls tpl/ncs-conf/*.xml tpl/ncs-conf/*.val | sort)
-        #cp -R raft $@
-
+.PHONY: NSO-vol
+NSO-vol:$(DESTS)
 
 .PHONY: NSO-vol/NSO1 NSO-vol/NSO2 NSO-vol/NSO3
+$(DESTS):
+        echo $@
+        -mkdir $@ && cp -R NSO-vol/NSO1/* $@
+        cp util/Makefile $@/run/packages/
+        cp config/ncs.conf $@/etc/ncs.conf
+        cp -R helpers $@
+        cp -R tpl $@
+
+
+
 deep_clean: clean_log clean_run clean clean_cert
 
 clean: 
