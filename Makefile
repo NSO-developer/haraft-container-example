@@ -5,18 +5,18 @@ ARCH=x86_64
 build: certs
 	docker load -i ./images/nso-${VER}.container-image-dev.linux.${ARCH}.tar.gz
 	docker load -i ./images/nso-${VER}.container-image-prod.linux.${ARCH}.tar.gz
-
 	docker build -t mod-nso-prod:${VER}  --no-cache --network=host --build-arg type="prod"  --build-arg ver=${VER}    --file Dockerfile .
 	docker build -t mod-nso-dev:${VER}  --no-cache --network=host --build-arg type="dev"  --build-arg ver=${VER}   --file Dockerfile .
-
-	docker run -d --name nso-prod -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin -e EXTRA_ARGS=--with-package-reload-force -v ./NSO-vol/NSO1:/nso -v ./NSO-log-vol/NSO1:/log mod-nso-prod:${VER}
+	docker run -d --name nso-prod -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin -e EXTRA_ARGS=--with-package-reload-force -v ./NSO-log-vol/NSO1:/log mod-nso-prod:${VER}
 	bash check_nso1_status.sh
 	docker exec nso-prod bash -c 'chmod 777 -R /nso/*'
 	docker exec nso-prod bash -c 'chmod 777 -R /log/*'
 	#docker exec nso-prod chmod 777 -R /nso
-
 	docker exec nso-prod rm -rf /nso/run/cdb
 	docker exec nso-prod mkdir /nso/run/cdb
+	docker cp nso-prod:/nso/ NSO-vol/
+	mv NSO-vol/nso NSO-vol/NSO1
+	rm -rf NSO-vol/nso
 	$(MAKE) NSO-vol/NSO1 NSO-vol/NSO2 NSO-vol/NSO3
 	$(MAKE) install-certs 
 	docker stop nso-prod && docker rm nso-prod
@@ -66,7 +66,7 @@ clean_cert:
 	rm -f raft/csr/*
 
 clean_run:
-	rm -rf ./NSO-vol/*/* 
+	rm -rf ./NSO-vol/* 
 
 clean_log:
 	rm -rf ./NSO-log-vol/*/*
