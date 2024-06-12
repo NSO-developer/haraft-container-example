@@ -76,7 +76,7 @@ clean_cdb:
 
 
 start:
-	export VER=${VER} ; docker compose up ${ENABLED_SERVICES}
+	export VER=${VER} ; docker compose up ${ENABLED_SERVICES} -d
 	bash check_status.sh
 	docker exec nso1 bash -c 'chmod 777 -R /nso/*'
 	docker exec nso1 bash -c 'chmod 777 -R /log/*'
