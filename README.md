@@ -1,4 +1,5 @@
 # Containerized NSO Example - HA RAFT
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/NSO-developer/haraft-container-example)  
 Example usecase of running HA RAFT with Containerized NSO. This example is modified from the official example in example.ncs - high-availability/raft-cluster
 
 ## Useage
