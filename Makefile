@@ -1,4 +1,4 @@
-VER=6.2.3
+VER=6.4.1.1
 ENABLED_SERVICES=NSO-1 NSO-2 NSO-3 BUILD-NSO-PKGS
 ARCH=x86_64
 DESTS=NSO-vol/NSO1 NSO-vol/NSO2 NSO-vol/NSO3
@@ -44,12 +44,12 @@ NSO-vol:$(DESTS)
 
 .PHONY: NSO-vol/NSO1 NSO-vol/NSO2 NSO-vol/NSO3
 $(DESTS):
-        echo $@
-        -mkdir $@ && cp -R NSO-vol/NSO1/* $@
-        cp util/Makefile $@/run/packages/
-        cp config/ncs.conf $@/etc/ncs.conf
-        cp -R helpers $@
-        cp -R tpl $@
+	echo $@
+	-mkdir $@ && cp -R NSO-vol/NSO1/* $@
+	cp util/Makefile $@/run/packages/
+	cp config/ncs.conf $@/etc/ncs.conf
+	cp -R helpers $@
+	cp -R tpl $@
 
 
 
