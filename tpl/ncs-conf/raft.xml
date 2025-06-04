@@ -6,7 +6,7 @@
       <node-address>nso~{ID}@10.0.0.~{ID}</node-address>
     </listen>
     <seed-nodes>
-      <seed-node>nso2@10.0.0.~{ID}</seed-node>
+      <seed-node>nso2@10.0.0.2</seed-node>
     </seed-nodes>
     <ssl>
       <ca-cert-file>/nso/certs/ca.crt</ca-cert-file>
