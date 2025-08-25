@@ -1,4 +1,4 @@
-VER=6.4.1.1
+VER=6.5
 ENABLED_SERVICES=NSO-1 NSO-2 NSO-3
 ARCH=x86_64
 DESTS=NSO-vol/NSO1 NSO-vol/NSO2 NSO-vol/NSO3
@@ -8,13 +8,13 @@ build: certs
 	docker load -i ./images/nso-${VER}.container-image-prod.linux.${ARCH}.tar.gz
 	docker build -t mod-nso-prod:${VER}  --no-cache --network=host --build-arg type="prod"  --build-arg ver=${VER}    --file Dockerfile .
 	docker build -t mod-nso-build:${VER}  --no-cache --network=host --build-arg type="build"  --build-arg ver=${VER}   --file Dockerfile .
-	docker run -d --name nso-prod -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin -e EXTRA_ARGS=--with-package-reload-force -v ./NSO-log-vol/NSO1:/log mod-nso-prod:${VER}
+	docker run -d --user root --name nso-prod -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin -e EXTRA_ARGS=--with-package-reload-force -v ./NSO-log-vol/NSO1:/log mod-nso-prod:${VER}
 	bash check_nso1_status.sh
-	docker exec nso-prod bash -c 'chmod 777 -R /nso/*'
-	docker exec nso-prod bash -c 'chmod 777 -R /log/*'
+	docker exec --user root nso-prod bash -c 'chmod 777 -R /nso/*'
+	docker exec --user root nso-prod bash -c 'chmod 777 -R /log/*'
 	#docker exec nso-prod chmod 777 -R /nso
-	docker exec nso-prod rm -rf /nso/run/cdb
-	docker exec nso-prod mkdir /nso/run/cdb
+	docker exec --user root nso-prod rm -rf /nso/run/cdb
+	docker exec --user root nso-prod mkdir /nso/run/cdb
 	docker cp nso-prod:/nso/ NSO-vol/
 	mv NSO-vol/nso NSO-vol/NSO1
 	rm -rf NSO-vol/nso
@@ -83,14 +83,15 @@ start:
 	cp config/ncs.conf NSO-vol/NSO2/etc/ncs.conf
 	cp config/ncs.conf NSO-vol/NSO3/etc/ncs.conf
 	export VER=${VER} ; docker compose up BUILD-NSO-PKGS -d
+	sleep 2
 	export VER=${VER} ; docker compose up ${ENABLED_SERVICES} -d
 	bash check_status.sh
-	docker exec nso1 bash -c 'chmod 777 -R /nso/*'
-	docker exec nso1 bash -c 'chmod 777 -R /log/*'
-	docker exec nso2 bash -c 'chmod 777 -R /nso/*'
-	docker exec nso2 bash -c 'chmod 777 -R /log/*'
-	docker exec nso3 bash -c 'chmod 777 -R /nso/*'
-	docker exec nso3 bash -c 'chmod 777 -R /log/*'
+	docker exec --user root nso1 bash -c 'chmod 777 -R /nso/*'
+	docker exec --user root nso1 bash -c 'chmod 777 -R /log/*'
+	docker exec --user root nso2 bash -c 'chmod 777 -R /nso/*'
+	docker exec --user root nso2 bash -c 'chmod 777 -R /log/*'
+	docker exec --user root nso3 bash -c 'chmod 777 -R /nso/*'
+	docker exec --user root nso3 bash -c 'chmod 777 -R /log/*'
 	cd config/ha_enable; sh nso1.sh
 	sleep 5
 	cd config/ha_enable; sh nso2.sh
@@ -103,26 +104,26 @@ stop:
 	-docker rm nso-prod -f
 
 compile_packages:
-	docker exec -it nso-build make all -C /nso1/run/packages
-	docker exec -it nso-build make all -C /nso2/run/packages
-	docker exec -it nso-build make all -C /nso3/run/packages
+	docker exec -user root -it nso-build make all -C /nso1/run/packages
+	docker exec -user root -it nso-build make all -C /nso2/run/packages
+	docker exec -user root -it nso-build make all -C /nso3/run/packages
 
 
 
 cli-c_nso1:
-	docker exec -it nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -C -u admin'
+	docker exec -user root -it nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -C -u admin'
 
 cli-c_nso2:
-	docker exec -it nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -C -u admin'
+	docker exec -user root -it nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -C -u admin'
 
 cli-c_nso3:
-	docker exec -it nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -C -u admin'
+	docker exec -user root -it nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -C -u admin'
 
 cli-j_nso1:
-	docker exec -it nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -J -u admin'
+	docker exec -user root -it nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -J -u admin'
 
 cli-j_nso2:
-	docker exec -it nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -J -u admin'
+	docker exec -user root -it nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -J -u admin'
 
 cli-j_nso3:
-	docker exec -it nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -J -u admin'
+	docker exec -user root -it nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -J -u admin'

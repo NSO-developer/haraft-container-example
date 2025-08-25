@@ -1,11 +1,11 @@
 #!/bin/bash
 
 
-var1=$(docker exec -i nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
+var1=$(docker exec --user root -i nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
 Data1=$(($var1))
-var2=$(docker exec -i nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
+var2=$(docker exec --user root -i nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
 Data2=$(($var2))
-var3=$(docker exec -i nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
+var3=$(docker exec --user root -i nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
 Data3=$(($var3))
 Result=$(($Data1+$Data2+$Data3))
 
@@ -15,11 +15,11 @@ echo -ne "NOT READY: NSO1 Status: $var1 / NSO2 Status: $var2 / NSO3 Status: $var
 
 while [ $Result -ne 0 ]
 do
-var1=$(docker exec -i nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
+var1=$(docker exec --user root -i nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
 Data1=$(($var1))
-var2=$(docker exec -i nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
+var2=$(docker exec --user root -i nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
 Data2=$(($var2))
-var3=$(docker exec -i nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
+var3=$(docker exec --user root -i nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -C -u admin <<< "exit" &> /dev/null ; echo $?')
 Data3=$(($var3))
 Result=$(($Data1+$Data2+$Data3))
 
