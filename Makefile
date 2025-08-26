@@ -99,31 +99,38 @@ start:
 	cd config/ha_enable; sh nso3.sh
 
 stop:
+	#rm -rf NSO-vol/*/run/state
+	docker exec --user root nso1 bash -c 'chmod 777 -R /nso/*'
+	docker exec --user root nso1 bash -c 'chmod 777 -R /log/*'
+	docker exec --user root nso2 bash -c 'chmod 777 -R /nso/*'
+	docker exec --user root nso2 bash -c 'chmod 777 -R /log/*'
+	docker exec --user root nso3 bash -c 'chmod 777 -R /nso/*'
+	docker exec --user root nso3 bash -c 'chmod 777 -R /log/*'
 	export VER=${VER} ;docker compose down BUILD-NSO-PKGS
 	export VER=${VER} ;docker compose down  ${ENABLED_SERVICES}
 	-docker rm nso-prod -f
 
 compile_packages:
-	docker exec -user root -it nso-build make all -C /nso1/run/packages
-	docker exec -user root -it nso-build make all -C /nso2/run/packages
-	docker exec -user root -it nso-build make all -C /nso3/run/packages
+	docker exec --user root -it nso-build make all -C /nso1/run/packages
+	docker exec --user root -it nso-build make all -C /nso2/run/packages
+	docker exec --user root -it nso-build make all -C /nso3/run/packages
 
 
 
 cli-c_nso1:
-	docker exec -user root -it nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -C -u admin'
+	docker exec --user root -it nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -C -u admin'
 
 cli-c_nso2:
-	docker exec -user root -it nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -C -u admin'
+	docker exec --user root -it nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -C -u admin'
 
 cli-c_nso3:
-	docker exec -user root -it nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -C -u admin'
+	docker exec --user root -it nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -C -u admin'
 
 cli-j_nso1:
-	docker exec -user root -it nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -J -u admin'
+	docker exec --user root -it nso1 bash -c 'NCS_IPC_PORT=4561 ncs_cli -J -u admin'
 
 cli-j_nso2:
-	docker exec -user root -it nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -J -u admin'
+	docker exec --user root -it nso2 bash -c 'NCS_IPC_PORT=4562 ncs_cli -J -u admin'
 
 cli-j_nso3:
-	docker exec -user root -it nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -J -u admin'
+	docker exec --user root -it nso3 bash -c 'NCS_IPC_PORT=4563 ncs_cli -J -u admin'
